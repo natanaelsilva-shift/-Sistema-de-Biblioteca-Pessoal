@@ -1,0 +1,43 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Relatorio</p>
+    <h1>Emprestimos atrasados</h1>
+  </div>
+</section>
+
+<section class="panel">
+  <p class="alert error" *ngIf="erro">{{ erro }}</p>
+  <p class="muted" *ngIf="carregando">Carregando atrasados...</p>
+
+  <div class="table-wrap" *ngIf="!carregando && atrasados.length; else vazio">
+    <table>
+      <thead>
+        <tr>
+          <th>Livro</th>
+          <th>Pessoa</th>
+          <th>Data prevista</th>
+          <th>Dias de atraso</th>
+          <th>Telefone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emprestimo of atrasados">
+          <td>
+            <strong>{{ emprestimo.livroTitulo }}</strong>
+            <span class="subtle">{{ emprestimo.livroAutor }}</span>
+          </td>
+          <td>{{ emprestimo.nomePessoa }}</td>
+          <td>{{ emprestimo.dataDevolucaoPrevista | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge danger">{{ emprestimo.diasAtraso }} dias</span>
+          </td>
+          <td>{{ emprestimo.telefone || '-' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #vazio>
+    <p class="empty-state" *ngIf="!carregando">Nenhum emprestimo atrasado.</p>
+  </ng-template>
+</section>

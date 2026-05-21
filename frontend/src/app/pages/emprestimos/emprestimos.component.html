@@ -1,0 +1,49 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Operacao</p>
+    <h1>Emprestimos ativos</h1>
+  </div>
+</section>
+
+<section class="panel">
+  <p class="alert error" *ngIf="erro">{{ erro }}</p>
+  <p class="alert success" *ngIf="sucesso">{{ sucesso }}</p>
+  <p class="muted" *ngIf="carregando">Carregando emprestimos...</p>
+
+  <div class="table-wrap" *ngIf="!carregando && emprestimos.length; else vazio">
+    <table>
+      <thead>
+        <tr>
+          <th>Livro</th>
+          <th>Pessoa</th>
+          <th>Telefone</th>
+          <th>Emprestimo</th>
+          <th>Prevista</th>
+          <th>Status</th>
+          <th class="actions-col">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emprestimo of emprestimos">
+          <td>{{ emprestimo.livroTitulo }}</td>
+          <td>{{ emprestimo.nomePessoa }}</td>
+          <td>{{ emprestimo.telefone || '-' }}</td>
+          <td>{{ emprestimo.dataEmprestimo | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ emprestimo.dataDevolucaoPrevista | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge" [class.danger]="emprestimo.atrasado" [class.warning]="!emprestimo.atrasado">
+              {{ emprestimo.atrasado ? 'Atrasado' : 'Ativo' }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="btn primary" type="button" (click)="devolver(emprestimo)">Devolver</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #vazio>
+    <p class="empty-state" *ngIf="!carregando">Nenhum emprestimo ativo.</p>
+  </ng-template>
+</section>

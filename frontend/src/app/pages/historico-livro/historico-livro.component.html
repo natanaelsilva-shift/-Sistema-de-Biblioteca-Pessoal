@@ -1,0 +1,51 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Historico</p>
+    <h1>{{ livro?.titulo || 'Livro' }}</h1>
+  </div>
+  <a class="btn secondary" routerLink="/livros">Voltar</a>
+</section>
+
+<section class="panel">
+  <p class="alert error" *ngIf="erro">{{ erro }}</p>
+  <p class="muted" *ngIf="carregando">Carregando historico...</p>
+
+  <div class="book-summary" *ngIf="livro as item">
+    <span>{{ item.autor }}</span>
+    <span>{{ item.categoriaNome }}</span>
+    <span>{{ item.status }}</span>
+  </div>
+
+  <div class="table-wrap" *ngIf="!carregando && historico.length; else vazio">
+    <table>
+      <thead>
+        <tr>
+          <th>Pessoa</th>
+          <th>Telefone</th>
+          <th>Emprestimo</th>
+          <th>Prevista</th>
+          <th>Devolucao</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let emprestimo of historico">
+          <td>{{ emprestimo.nomePessoa }}</td>
+          <td>{{ emprestimo.telefone || '-' }}</td>
+          <td>{{ emprestimo.dataEmprestimo | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ emprestimo.dataDevolucaoPrevista | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ emprestimo.dataDevolucaoEfetiva ? (emprestimo.dataDevolucaoEfetiva | date: 'dd/MM/yyyy') : '-' }}</td>
+          <td>
+            <span class="badge" [class.danger]="emprestimo.atrasado" [class.success]="emprestimo.dataDevolucaoEfetiva">
+              {{ emprestimo.dataDevolucaoEfetiva ? 'Devolvido' : emprestimo.atrasado ? 'Atrasado' : 'Ativo' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #vazio>
+    <p class="empty-state" *ngIf="!carregando">Este livro ainda nao possui emprestimos.</p>
+  </ng-template>
+</section>

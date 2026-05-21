@@ -1,0 +1,202 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Acervo</p>
+    <h1>Livros</h1>
+  </div>
+</section>
+
+<div class="create-layout">
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Novo livro</h2>
+    </div>
+
+    <form [formGroup]="livroForm" (ngSubmit)="salvarLivro()" class="form-grid">
+      <label>
+        Titulo
+        <input type="text" formControlName="titulo" placeholder="Titulo do livro" />
+      </label>
+
+      <label>
+        Autor
+        <input type="text" formControlName="autor" placeholder="Nome do autor" />
+      </label>
+
+      <label>
+        ISBN
+        <input type="text" formControlName="isbn" placeholder="Opcional" />
+      </label>
+
+      <label>
+        Ano
+        <input type="number" formControlName="ano" min="1" max="2100" />
+      </label>
+
+      <label>
+        Categoria
+        <select formControlName="categoriaId">
+          <option value="">Selecione</option>
+          <option *ngFor="let categoria of categorias" [value]="categoria.id">
+            {{ categoria.nome }}
+          </option>
+        </select>
+      </label>
+
+      <p class="field-error" *ngIf="livroForm.touched && livroForm.invalid">
+        Preencha titulo, autor, ano e categoria.
+      </p>
+
+      <button class="btn primary" type="submit">Cadastrar livro</button>
+    </form>
+  </section>
+</div>
+
+<div class="modal-backdrop" *ngIf="livroParaEmprestimo as livro" (click)="cancelarEmprestimo()">
+  <section
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="emprestimo-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Emprestimo</p>
+        <h2 id="emprestimo-title">{{ livro.titulo }}</h2>
+        <p class="muted">{{ livro.autor }} - {{ livro.categoriaNome }}</p>
+      </div>
+      <button class="btn ghost" type="button" (click)="cancelarEmprestimo()">Cancelar</button>
+    </div>
+
+    <p class="alert error" *ngIf="erro">{{ erro }}</p>
+
+    <form [formGroup]="emprestimoForm" (ngSubmit)="emprestar()" class="form-grid">
+      <label>
+        Pessoa
+        <input type="text" formControlName="nomePessoa" placeholder="Nome de quem recebeu" autofocus />
+      </label>
+
+      <label>
+        Telefone
+        <input type="text" formControlName="telefone" placeholder="Opcional" />
+      </label>
+
+      <label>
+        Data do emprestimo
+        <input type="date" formControlName="dataEmprestimo" />
+      </label>
+
+      <label>
+        Devolucao prevista
+        <input type="date" formControlName="dataDevolucaoPrevista" />
+      </label>
+
+      <p class="field-error" *ngIf="emprestimoForm.touched && emprestimoForm.invalid">
+        Preencha a pessoa e as datas do emprestimo.
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn ghost" type="button" (click)="cancelarEmprestimo()">Cancelar</button>
+        <button class="btn primary" type="submit">Registrar emprestimo</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<section class="panel">
+  <div class="panel-heading">
+    <div>
+      <p class="eyebrow">Consulta</p>
+      <h2>Lista de livros</h2>
+    </div>
+  </div>
+
+  <form [formGroup]="filtroForm" (ngSubmit)="carregarLivros()" class="filters">
+    <label>
+      Categoria
+      <select formControlName="categoriaId">
+        <option value="">Todas</option>
+        <option *ngFor="let categoria of categorias" [value]="categoria.id">
+          {{ categoria.nome }}
+        </option>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select formControlName="status">
+        <option value="TODOS">Todos</option>
+        <option value="DISPONIVEL">Disponivel</option>
+        <option value="EMPRESTADO">Emprestado</option>
+      </select>
+    </label>
+
+    <label>
+      Busca
+      <input type="search" formControlName="busca" placeholder="Titulo ou autor" />
+    </label>
+
+    <div class="filter-actions">
+      <button class="btn primary" type="submit">Aplicar filtros</button>
+      <button class="btn secondary" type="button" (click)="limparFiltros()">Limpar</button>
+    </div>
+  </form>
+
+  <p class="alert error" *ngIf="erro">{{ erro }}</p>
+  <p class="alert success" *ngIf="sucesso">{{ sucesso }}</p>
+  <p class="muted" *ngIf="carregando">Carregando livros...</p>
+
+  <div class="table-wrap" *ngIf="!carregando && livros.length; else vazio">
+    <table>
+      <thead>
+        <tr>
+          <th>Titulo</th>
+          <th>Autor</th>
+          <th>Categoria</th>
+          <th>Ano</th>
+          <th>Status</th>
+          <th class="actions-col">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let livro of livros">
+          <td>
+            <strong>{{ livro.titulo }}</strong>
+            <span class="subtle" *ngIf="livro.isbn">ISBN {{ livro.isbn }}</span>
+          </td>
+          <td>{{ livro.autor }}</td>
+          <td>{{ livro.categoriaNome }}</td>
+          <td>{{ livro.ano }}</td>
+          <td>
+            <span class="badge" [class.success]="livro.status === 'DISPONIVEL'" [class.warning]="livro.status === 'EMPRESTADO'">
+              {{ livro.status }}
+            </span>
+          </td>
+          <td class="actions">
+            <button
+              class="btn secondary"
+              type="button"
+              [disabled]="livro.status === 'EMPRESTADO'"
+              (click)="abrirEmprestimo(livro)"
+            >
+              Emprestar
+            </button>
+            <a class="btn ghost" [routerLink]="['/livros', livro.id, 'historico']">Historico</a>
+            <button
+              class="btn danger"
+              type="button"
+              [disabled]="livro.status === 'EMPRESTADO'"
+              (click)="excluirLivro(livro)"
+            >
+              Excluir
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #vazio>
+    <p class="empty-state" *ngIf="!carregando">Nenhum livro encontrado.</p>
+  </ng-template>
+</section>

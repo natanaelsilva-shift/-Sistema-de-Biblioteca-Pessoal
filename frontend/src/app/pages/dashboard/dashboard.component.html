@@ -1,0 +1,72 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Visao geral</p>
+    <h1>Dashboard</h1>
+  </div>
+  <a class="btn primary" routerLink="/livros">Novo livro</a>
+</section>
+
+<p class="alert error" *ngIf="erro">{{ erro }}</p>
+<p class="muted" *ngIf="carregando">Carregando dashboard...</p>
+
+<ng-container *ngIf="dashboard as data">
+  <section class="stats-grid">
+    <article class="stat-card">
+      <span>Total de livros</span>
+      <strong>{{ data.totalLivros }}</strong>
+    </article>
+    <article class="stat-card success">
+      <span>Disponiveis</span>
+      <strong>{{ data.totalDisponiveis }}</strong>
+    </article>
+    <article class="stat-card warning">
+      <span>Emprestados</span>
+      <strong>{{ data.totalEmprestados }}</strong>
+    </article>
+    <article class="stat-card danger">
+      <span>Emprestimos ativos</span>
+      <strong>{{ data.totalEmprestimosAtivos }}</strong>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Movimentacao</p>
+        <h2>Ultimos 5 emprestimos</h2>
+      </div>
+      <a class="btn secondary" routerLink="/emprestimos">Ver ativos</a>
+    </div>
+
+    <div class="table-wrap" *ngIf="data.ultimosEmprestimos.length; else vazio">
+      <table>
+        <thead>
+          <tr>
+            <th>Livro</th>
+            <th>Pessoa</th>
+            <th>Emprestimo</th>
+            <th>Prevista</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emprestimo of data.ultimosEmprestimos">
+            <td>{{ emprestimo.livroTitulo }}</td>
+            <td>{{ emprestimo.nomePessoa }}</td>
+            <td>{{ emprestimo.dataEmprestimo | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ emprestimo.dataDevolucaoPrevista | date: 'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="badge" [class.danger]="emprestimo.atrasado" [class.success]="emprestimo.dataDevolucaoEfetiva">
+                {{ emprestimo.dataDevolucaoEfetiva ? 'Devolvido' : emprestimo.atrasado ? 'Atrasado' : 'Ativo' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #vazio>
+      <p class="empty-state">Nenhum emprestimo registrado.</p>
+    </ng-template>
+  </section>
+</ng-container>

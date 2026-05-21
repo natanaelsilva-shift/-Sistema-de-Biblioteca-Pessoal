@@ -1,0 +1,71 @@
+<section class="page-header">
+  <div>
+    <p class="eyebrow">Cadastro base</p>
+    <h1>Categorias</h1>
+  </div>
+</section>
+
+<div class="split-layout">
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Nova categoria</h2>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="form-grid">
+      <label>
+        Nome
+        <input type="text" formControlName="nome" placeholder="Ex.: Tecnologia" />
+        <small class="field-error" *ngIf="form.controls.nome.touched && form.controls.nome.invalid">
+          Informe um nome com ate 120 caracteres.
+        </small>
+      </label>
+
+      <label>
+        Descricao
+        <textarea rows="4" formControlName="descricao" placeholder="Descricao opcional"></textarea>
+      </label>
+
+      <button class="btn primary" type="submit">Cadastrar</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">Listagem</p>
+        <h2>Categorias cadastradas</h2>
+      </div>
+    </div>
+
+    <p class="alert error" *ngIf="erro">{{ erro }}</p>
+    <p class="alert success" *ngIf="sucesso">{{ sucesso }}</p>
+    <p class="muted" *ngIf="carregando">Carregando categorias...</p>
+
+    <div class="table-wrap" *ngIf="!carregando && categorias.length; else vazio">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Descricao</th>
+            <th>Livros</th>
+            <th class="actions-col">Acoes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let categoria of categorias">
+            <td>{{ categoria.nome }}</td>
+            <td>{{ categoria.descricao || '-' }}</td>
+            <td>{{ categoria.quantidadeLivros }}</td>
+            <td class="actions">
+              <button class="btn danger" type="button" (click)="excluir(categoria)">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #vazio>
+      <p class="empty-state" *ngIf="!carregando">Nenhuma categoria cadastrada.</p>
+    </ng-template>
+  </section>
+</div>
